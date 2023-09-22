@@ -20,13 +20,10 @@ app.get('/', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
-//The following HTML routes should be created:
-
 //GET /notes should return the notes.html file.
 app.get('/notes', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/notes.html'))
 );
-
 
 //GET * should return the index.html file.
 // * is a wildcard, will return the index.html as indicated by "/"
@@ -34,55 +31,27 @@ app.get('*', (req, res) => {
     res.send('<a href="/">Oopsie daisy! Nothing to see here. Navigate back to the homepage?</a>');
 });
 
-//The following API routes should be created:
 
 //GET /api/notes should read the db.json file and return all saved notes as JSON.
 app.get('/api/notes', (req, res) => {
 
-    //destructure for the items in req.body
-    const { title, text } = req.body
+    //read the db.json file
+    fs.readFile('./db/db.json', 'utf8', (err, data) => { //file, encoding, callback function
+        if (err) {
+            console.error(err);
+        } else {
 
-    //if all the required properties are present,
-    if (title && text) {
+            //convert string into JSON object
+            const parsedNotes = JSON.parse(data);
 
-        //variable where title value = title property, text value = text property
-        const newNote = {
-            title,
-            text,
-            id: uuid(),
-        };
-
-        //if we have the required properties, then we can obtain existing notes
-        fs.readFile('./db/db.json', 'utf8', (err, data) => { //file, encoding, callback function
-            if (err) {
-                console.error(err);
-            } else {
-
-                //convert string into JSON object
-                const parsedNotes = JSON.parse(data);
-
-                //add a new note to the JSON object
-                parsedNotes = push(newNote);
-
-                //return saved notes as JSON
-                return JSON.stringify(parsedNotes);
-
-                /*
-                //write updated notes back to the file, and stringify the JSON object
-                fs.writeFile('./db/db.json', JSON.stringify(parsedNotes, null, 2), (writeErr) => //(file, data, options, callback) ---- ASK RACHEL AGAIN WHAT THE NULL AND 2 IS?????
-                    writeErr ? console.error(writeErr) : console.info('Succesful! Yay!')
-                );
-                */
-            }
-        });
-    }
-});
+            parsedNotes.push(newNote);
+            
+        }});
+    });
 
 
-//POST req to add a note
-/*POST /api/notes should receive a new note to save on the req body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved (look into npm packages that could do this for you).
-*/
-
+//POST /api/notes should receive a new note to save on the req body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved 
+//(look into npm packages that could do this for you).
 app.post('/api/notes', (req, res) => {
 
     //send a message to the client that req has been received to post a note
@@ -104,58 +73,30 @@ app.post('/api/notes', (req, res) => {
             id: uuid(),
         };
 
+        //should receive a new note to save on the req body--convert data to a string so we can save it
+        const stringNote = JSON.stringify(newNote);
 
-        //if we have the required properties, then we can obtain existing notes
-        fs.readFile('./db/db.json', 'utf8', (err, data) => { //file, encoding, callback function
-            if (err) {
-                console.error(err);
-            } else {
-
-                //convert string into JSON object
-                const parsedNotes = JSON.parse(data);
-
-                //add a new note to the JSON object
-                parsedNotes = push(newNote);
-
-                //write updated notes back to the file, and stringify the JSON object
-                fs.writeFile('./db/db.json', JSON.stringify(parsedNotes, null, 2), (writeErr) => //(file, data, options, callback) ---- ASK RACHEL AGAIN WHAT THE NULL AND 2 IS?????
-                    writeErr ? console.error(writeErr) : console.info('Succesfully posted a note! Yay!')
-                );
-            }
-        });
-
-        const res = {
+        //write the JSON string to the db.json file
+        fs.writeFile('./db/db.json', stringNote, (err) =>
+            err
+                ? console.error(err)
+                : console.log(
+                    `Note has been written to JSON file`
+                )
+        );
+        //then return the new note to the client
+        const response = {
             status: 'success',
             body: newNote,
         };
 
+        console.log(response);
+        res.status(201).json(response);
 
-        console.log(res);
-        res.status(201).json(res);
     } else {
         res.status(500).json('Error in posting note');
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //server listener, the server's job is to listen for reqs
