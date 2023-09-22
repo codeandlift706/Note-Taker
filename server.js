@@ -17,7 +17,7 @@ app.use(express.static('public')); //so long as we have a file titled "index" in
 
 //this below is not needed if we have line 16
 app.get('/', (request, response) =>
-    res.sendFile(path.join(__dirname, '/public/index.html'))
+    response.sendFile(path.join(__dirname, '/Develop/public/index.html'))
 );
 
 //The following HTML routes should be created:
@@ -25,12 +25,12 @@ app.get('/', (request, response) =>
 //GET * should return the index.html file.
 // * is a wildcard, will return the index.html as indicated by "/"
 app.get('*', (request, response) => {
-    res.send('<a href="/">Oopsie daisy! Nothing to see here. Navigate back to the homepage?</a>');
+    response.send('<a href="/">Oopsie daisy! Nothing to see here. Navigate back to the homepage?</a>');
 });
 
 //GET /notes should return the notes.html file.
 app.get('/notes', (request, response) => {
-    res.send('<a href="/notes">See notes here.</a>');
+    response.send('<a href="/notes">See notes here.</a>');
 });
 
 
