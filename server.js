@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path'); //this is for...
 const fs = require('fs'); //this is for the readFile & writeToFile functions--data to persist beyond server
 
-// Helper method for generate unique ids --to put in body of get/post reqs functions!!!!!!
+// Helper method for generate unique ids --to put in body
 const uuid = require('./helpers/uuid');
 
 //boilerplate middleware
@@ -41,7 +41,7 @@ app.post('/api/notes', (req, res) => {
 
         //variable where title value = title property, text value = text property
         //structure note with structure and content needed
-        const newNote = {
+        const note = {
             title,
             text,
             id: uuid(),
@@ -58,7 +58,7 @@ app.post('/api/notes', (req, res) => {
 
                 //parsedNotes = array
                 //add new note to the array
-                parsedNotes.push(newNote);
+                parsedNotes.push(note);
 
                 //NOW THIS WRITES THE OLD AND NEW NOTES TO THE FILE, BUT WRITEFILE ONLY TAKES STRINGS
                 fs.writeFile(`./db/db.json`, JSON.stringify(parsedNotes),
@@ -71,7 +71,7 @@ app.post('/api/notes', (req, res) => {
         //NOW FOR THE CLIENT ---> build a response object
         const response = {
             status: 'success',
-            body: newNote,
+            body: note,
         };
 
         //then return the new note to the client. res.json is like pushing the send button on the email
@@ -81,7 +81,6 @@ app.post('/api/notes', (req, res) => {
         res.status(500).json('Error in posting note');
     }
 });
-
 
 
 //GET /api/notes should read the db.json file and return all saved notes as JSON.
@@ -104,7 +103,6 @@ app.get('/api/notes', (req, res) => {
 app.get('*', (req, res) => {
     res.send('<a href="/">Oopsie daisy! Nothing to see here. Navigate back to the homepage?</a>');
 });
-
 
 
 //server listener, the server's job is to listen for reqs
