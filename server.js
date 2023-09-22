@@ -37,14 +37,11 @@ app.get('*', (req, res) => {
 //(look into npm packages that could do this for you).
 app.post('/api/notes', (req, res) => {
 
-    //send a message to the client that req has been received to post a note
-    // res.status(200).json(`${req.method} request received to post a note.`);
-
-    //log this req to the terminal that the client has reqed to post a note
+    //log this req to the terminal that the client has requested to post a note
     console.info(`${req.method} request received to post a note.`)
 
     //destructure for the items in req.body
-    const { title, text } = req.body
+    const { title, text } = req.body;
 
     //if all the required properties are present,
     if (title && text) {
@@ -56,37 +53,38 @@ app.post('/api/notes', (req, res) => {
             text,
             id: uuid(),
         };
-        console.log(newNote);
 
-        //should receive a new note to save on the req body--convert data to a string so we can save it, writeFile only wants strings
-        const stringNotes = JSON.stringify(newNote);
-
-        //we read the old file, save the old note. we then parse the stringed note
-
-        //write the JSON string to the db.json file
-        fs.writeFile(`./db/db.json`, stringNotes, (err) => {
+        // BEFORE ADDING IN A NEW NOTE, READ THE FILE FOR OLD NOTES
+        // Obtain existing notes
+        fs.readFile('./db/reviews.json', 'utf8', (err, data) => {
             if (err) {
-                console.error(err)
-                return res.status(500).json('Error in posting note');
-            }
-            else {
-                console.log('A new note has been written to JSON file')
+                console.error(err);
+            } else {
+                // Convert string into javascript object with JSON parse
+                const parsedNotes = JSON.parse(data);
 
-                //build a response object
-                const response = {
-                    status: 'success',
-                    body: newNote,
-                };
-                //readfile, parse the data since its a string, then create array and push notes into it. Use spread method to put in new notes into array with old notes
-                notesArray  //SPREAD!!!!!!
+                // Add a new note to the javascript object
+                parsedNotes.push(newNote);
 
-                //then return the new note to the client. res.json is like pushing the send button on the email
-                console.log(response);
-                return res.status(201).json(response);
+                //NOW THIS WRITES THE OLD AND NEW NOTES TO THE FILE, BUT WRITEFILE ONLY TAKES STRINGS. CONVERT parsedNotes into string
+                fs.writeFile(`./db/db.json`, JSON.stringify(parsedNotes),
+                    (writeErr) =>
+                        writeErr ? console.error(err) : console.info('A new note has been written to JSON file')
+                );
             }
         });
+
+        //NOW FOR THE CLIENT ---> build a response object
+        const response = {
+            status: 'success',
+            body: newNote,
+        };
+
+        //then return the new note to the client. res.json is like pushing the send button on the email
+        console.log(response);
+        return res.status(201).json(response);
     } else {
-        res.status(500).json('Error in posting note'); //if we don't get the content of note (title,text), error
+        res.status(500).json('Error in posting note');
     }
 });
 
@@ -100,7 +98,7 @@ app.get('/api/notes', (req, res) => {
         if (err) {
             console.error(err);
         } else {
-            return data;
+            return res.status(201).json(data);
         }
     });
 });
