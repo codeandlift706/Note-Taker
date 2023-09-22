@@ -1,7 +1,7 @@
 //require express
 const express = require('express');
 const path = require('path'); //this is for...
-const fs = require('fs'); //this is for the readFile & writeToFile functions
+const fs = require('fs'); //this is for the readFile & writeToFile functions--data to persist beyond server
 
 // Helper method for generate unique ids --to put in body of get/post reqs functions!!!!!!
 const uuid = require('./helpers/uuid');
@@ -32,30 +32,13 @@ app.get('*', (req, res) => {
 });
 
 
-//GET /api/notes should read the db.json file and return all saved notes as JSON.
-app.get('/api/notes', (req, res) => {
-
-    //read the db.json file
-    fs.readFile('./db/db.json', 'utf8', (err, data) => { //file, encoding, callback function
-        if (err) {
-            console.error(err);
-        } else {
-
-            //convert string into JSON object
-            const parsedNotes = JSON.parse(data);
-
-            parsedNotes.push(newNote);
-            
-        }});
-    });
-
 
 //POST /api/notes should receive a new note to save on the req body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved 
 //(look into npm packages that could do this for you).
 app.post('/api/notes', (req, res) => {
 
     //send a message to the client that req has been received to post a note
-    res.status(200).json(`${req.method} request received to post a note.`);
+    // res.status(200).json(`${req.method} request received to post a note.`);
 
     //log this req to the terminal that the client has reqed to post a note
     console.info(`${req.method} request received to post a note.`)
@@ -67,36 +50,64 @@ app.post('/api/notes', (req, res) => {
     if (title && text) {
 
         //variable where title value = title property, text value = text property
+        //structure note with structure and content needed
         const newNote = {
             title,
             text,
             id: uuid(),
         };
+        console.log(newNote);
 
-        //should receive a new note to save on the req body--convert data to a string so we can save it
-        const stringNote = JSON.stringify(newNote);
+        //should receive a new note to save on the req body--convert data to a string so we can save it, writeFile only wants strings
+        const stringNotes = JSON.stringify(newNote);
+
+        //we read the old file, save the old note. we then parse the stringed note
 
         //write the JSON string to the db.json file
-        fs.writeFile('./db/db.json', stringNote, (err) =>
-            err
-                ? console.error(err)
-                : console.log(
-                    `Note has been written to JSON file`
-                )
-        );
-        //then return the new note to the client
-        const response = {
-            status: 'success',
-            body: newNote,
-        };
+        fs.writeFile(`./db/db.json`, stringNotes, (err) => {
+            if (err) {
+                console.error(err)
+                return res.status(500).json('Error in posting note');
+            }
+            else {
+                console.log('A new note has been written to JSON file')
 
-        console.log(response);
-        res.status(201).json(response);
+                //build a response object
+                const response = {
+                    status: 'success',
+                    body: newNote,
+                };
+                //readfile, parse the data since its a string, then create array and push notes into it. Use spread method to put in new notes into array with old notes
+                notesArray  //SPREAD!!!!!!
 
+                //then return the new note to the client. res.json is like pushing the send button on the email
+                console.log(response);
+                return res.status(201).json(response);
+            }
+        });
     } else {
-        res.status(500).json('Error in posting note');
+        res.status(500).json('Error in posting note'); //if we don't get the content of note (title,text), error
     }
 });
+
+
+
+//GET /api/notes should read the db.json file and return all saved notes as JSON.
+app.get('/api/notes', (req, res) => {
+
+    //read the db.json file
+    fs.readFile('./db/db.json', 'utf8', (err, data) => { //file, encoding, callback function
+        if (err) {
+            console.error(err);
+        } else {
+            return data;
+        }
+    });
+});
+
+
+
+
 
 
 //server listener, the server's job is to listen for reqs
