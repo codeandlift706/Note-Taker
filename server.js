@@ -25,13 +25,6 @@ app.get('/notes', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/notes.html'))
 );
 
-//GET * should return the index.html file.
-// * is a wildcard, will return the index.html as indicated by "/"
-app.get('*', (req, res) => {
-    res.send('<a href="/">Oopsie daisy! Nothing to see here. Navigate back to the homepage?</a>');
-});
-
-
 
 //POST /api/notes should receive a new note to save on the req body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved 
 //(look into npm packages that could do this for you).
@@ -56,17 +49,18 @@ app.post('/api/notes', (req, res) => {
 
         // BEFORE ADDING IN A NEW NOTE, READ THE FILE FOR OLD NOTES
         // Obtain existing notes
-        fs.readFile('./db/reviews.json', 'utf8', (err, data) => {
+        fs.readFile('./db/db.json', 'utf8', (err, data) => {
             if (err) {
                 console.error(err);
             } else {
                 // Convert string into javascript object with JSON parse
                 const parsedNotes = JSON.parse(data);
 
-                // Add a new note to the javascript object
+                //parsedNotes = array
+                //add new note to the array
                 parsedNotes.push(newNote);
 
-                //NOW THIS WRITES THE OLD AND NEW NOTES TO THE FILE, BUT WRITEFILE ONLY TAKES STRINGS. CONVERT parsedNotes into string
+                //NOW THIS WRITES THE OLD AND NEW NOTES TO THE FILE, BUT WRITEFILE ONLY TAKES STRINGS
                 fs.writeFile(`./db/db.json`, JSON.stringify(parsedNotes),
                     (writeErr) =>
                         writeErr ? console.error(err) : console.info('A new note has been written to JSON file')
@@ -94,17 +88,22 @@ app.post('/api/notes', (req, res) => {
 app.get('/api/notes', (req, res) => {
 
     //read the db.json file
-    fs.readFile('./db/db.json', 'utf8', (err, data) => { //file, encoding, callback function
+    fs.readFile('./db/db.json', 'utf8', (err, data) => { //file, encoding, callback function. readFile reads the data as a string
         if (err) {
             console.error(err);
         } else {
-            return res.status(201).json(data);
+            return res.status(201).json(JSON.parse(data)); //we have to parse the data and turn it into JSON
         }
     });
 });
 
 
 
+//GET * should return the index.html file.
+// * is a wildcard, will return the index.html as indicated by "/"
+app.get('*', (req, res) => {
+    res.send('<a href="/">Oopsie daisy! Nothing to see here. Navigate back to the homepage?</a>');
+});
 
 
 
