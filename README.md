@@ -27,9 +27,9 @@ This can be used when users want to track what tasks they need to complete.
 View a screenshot of the functions for imports and boilerplate middleware:
 ![Screenshot of boilerplate material](assets/boilerplateScreenshot.png)
 View a screenshot of the POST call in VS Code:
-![Screenshot of POST](assets/postScreenshott.png)
+![Screenshot of post](assets/postScreenshott.png)
 View a screenshot of the GET calls and port listener in VS Code:
-![Screenshot of GET](assets/getScreenshot.png)
+![Screenshot of get](assets/getScreenshot.png)
 
 
 
