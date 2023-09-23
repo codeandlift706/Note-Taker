@@ -7,7 +7,7 @@ const fs = require('fs'); //this is for the readFile & writeToFile functions--da
 const uuid = require('./helpers/uuid');
 
 //boilerplate middleware
-const PORT = 3001;
+const PORT = process.env.PORT || 3001; //to deploy to Heroku
 const app = express(); //create instance of express
 
 app.use(express.json()); //when we make reqs, we can use json format AND
