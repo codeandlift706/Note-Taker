@@ -13,7 +13,7 @@
 
 
 ## Description
-The purpose of creating a Note-Taker application is so that users can write and save notes to track tasks they need to complete. Once the user clicks “Get Started” on the front page, the user is then directed to the Note Taker page where they input the title and text of the task. Once they do, they click the save icon in the upper righthand corner to save the task. Tasks will show up on the left side of the same page. The tasks will still persist through page refreshes. See (#tests) for a step-by-step. See the deployed application on Heroku here: TO BE LINKED
+The purpose of creating a Note-Taker application is so that users can write and save notes to track tasks they need to complete. Once the user clicks “Get Started” on the front page, the user is then directed to the Note Taker page where they input the title and text of the task. Once they do, they click the save icon in the upper righthand corner to save the task. Tasks will show up on the left side of the same page. The tasks will still persist through page refreshes. See [Tests](#tests) for a step-by-step. See the deployed application on Heroku here: TO BE LINKED
 
 
 ## Installation
